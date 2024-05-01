@@ -1,7 +1,5 @@
 from datetime import datetime
-
 from db import DatabaseManager
-
 
 def create_table_product():
     with DatabaseManager() as cursor:
@@ -99,3 +97,4 @@ def bulk_insert_products(products):
                                                ) for p in products])
         except Exception as e:
             print(f"Error bulk inserting products: {e}")
+            

@@ -5,14 +5,13 @@ from config import settings
 from db.models import Base
 # Base = declarative_base()
 
-
 DATABASE_URL = settings.DB_CONN_URL
+
 try:
     engine = create_async_engine(DATABASE_URL, echo=True)
     async_session = sessionmaker(bind=engine, class_=AsyncSession)
 except Exception as e:
-    print(e)
-
+    print(f'Module engine.py : {e}')
 
 async def create_db():
     async with engine.begin() as connection:

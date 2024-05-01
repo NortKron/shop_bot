@@ -11,7 +11,7 @@ try:
     engine = create_engine(DATABASE_URL, pool_size=6, echo=True)
     Session = sessionmaker(bind=engine)
 except Exception as e:
-    print(e)
+    print(f'Module engine.py : {e}')
 
 
 def create_db():

@@ -1,6 +1,7 @@
-**/__pycache__/
-.env
-.idea
-catalog.html
-product.html
-main.html
+__pycache__/
+.venv/
+.vscode/
+logs/
+
+*.pyc
+*.bak

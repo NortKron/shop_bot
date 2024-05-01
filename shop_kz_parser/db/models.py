@@ -1,9 +1,7 @@
 import json
 from decimal import Decimal
 from typing import Any
-
-from sqlalchemy import (DateTime, ForeignKey, Numeric, String, Text, func, Boolean,
-                        JSON)
+from sqlalchemy import (DateTime, ForeignKey, Numeric, String, Text, func, Boolean, JSON)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -41,5 +39,3 @@ class Product(Base):
 
     category_id: Mapped[int] = mapped_column(ForeignKey('category.id', ondelete='SET NULL'), nullable=False)
     category: Mapped[Category] = relationship(backref='product')
-
-

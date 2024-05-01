@@ -3,14 +3,14 @@ import logging
 import random
 import time
 import requests
-from datetime import datetime
-from urllib.parse import urljoin
-from bs4 import BeautifulSoup
 
-from db.crud import bulk_insert_products, get_or_create_category
-from db.engine import create_db
-from utils import reload_request, convert_to_float, get_category_name, write_to_file
+from datetime       import datetime
+from urllib.parse   import urljoin
+from bs4            import BeautifulSoup
 
+from db.crud        import bulk_insert_products, get_or_create_category
+from db.engine      import create_db
+from utils          import reload_request, convert_to_float, get_category_name, write_to_file
 
 def get_catalog(s, main_url):
     catalogs_urls = []
@@ -43,7 +43,7 @@ def get_product(s, category_obj, product_url, main_url):
         div_exist = div_container.find('div', class_='bx-item-buttons')
         if div_exist:
             product_obj['exist'] = False if (
-                    'Увы, этот товар закончился. Посмотритедругие варианты' in
+                    'Увы, этот товар закончился. Посмотрите другие варианты' in
                     [span.get_text(strip=True) for span in div_exist.find_all('span')]) else True
         product_obj['price_list'] = None
         product_obj['price_in_chain_stores'] = None
@@ -119,7 +119,6 @@ def get_catalog_products(s, catalog_url, main_url):
         soup = BeautifulSoup(r.text, 'lxml')
         page += 1
 
-
 def get_sub_catalog_urls(s, catalog_url, main_url):
     r = reload_request(s, 'GET', catalog_url)
     soup = BeautifulSoup(r.text, 'lxml')
@@ -130,16 +129,16 @@ def get_sub_catalog_urls(s, catalog_url, main_url):
     sub_catalogs_urls = [urljoin(main_url, x.find('a')['href']) for x in dev_sub_catalog]
     return sub_catalogs_urls
 
-
 def get_sub_catalog_urls_all(s, catalog_url, main_url):
     r = reload_request(s, 'GET', catalog_url)
     soup = BeautifulSoup(r.text, 'lxml')
     sub_catalog_devs = soup.find('div', class_='bx_catalog_tile').find_all('li')
     return sub_catalog_devs
 
-
 def main():
     try:
+        print('start...')
+
         create_db()
         main_url = 'https://shop.kz/'
         s = requests.Session()
@@ -165,8 +164,8 @@ def main():
                 time.sleep(delay)
         logging.info(f'Parsing finish: {datetime.now().time()}')
     except Exception as e:
-        logging.error(e)
-
+        print(f'Main Exception : {e}')
+        logging.error(f'Main Exception : {e}')
 
 def get_sub_catalogs_urls():
     sub_catalog_urls = {}
@@ -191,7 +190,6 @@ def get_sub_catalogs_urls():
             for div in sub_sub_catalog_devs:
                 sub_catalog_urls[div.text.replace('\n', '')] = urljoin(main_url, div.find('a')['href'])
     write_to_file('sub_catalogs_url.json', sub_catalog_urls)
-
 
 if __name__ == '__main__':
     logging.basicConfig(

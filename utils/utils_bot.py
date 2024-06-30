@@ -4,6 +4,10 @@ import aiofiles
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import file
 
+'''
+Различные функции. В этом файле будут лежать функции для рассылки, 
+генерации текста и изображений через API и другие
+'''
 
 class Paginator:
     def __init__(self, array: list | tuple, page: int=1, per_page: int=1):

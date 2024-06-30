@@ -2,4 +2,5 @@
 
 ### get started
 
-Телеграм бот с функицями интернет магазина и парсинга сайтов
+Telegram bot with online store and website parsing functions.
+Stack: Airogram 3, PostgreSQL, Asyncio

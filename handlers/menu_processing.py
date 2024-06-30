@@ -1,3 +1,4 @@
+import config
 from io import BytesIO
 
 from aiogram import types
@@ -5,28 +6,24 @@ from aiogram.types import InputMediaPhoto
 from aiogram.enums import ParseMode
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from utils.utils_bot import Paginator, save_bytes_to_image
+from db.crud import get_db_catalogs, get_db_products, add_to_db_cart, delete_from_db_cart, reduce_product_in_db_cart, get_user_carts, get_product_db_by_title
+from kb import get_user_main_menu, get_user_catalogs, get_products_bts, get_user_cart_bts, get_simple_kb, get_search_result_bts
 
-from db.crud import get_db_catalogs, get_db_products, add_to_db_cart, delete_from_db_cart, reduce_product_in_db_cart, \
-    get_user_carts, get_product_db_by_title
-from kb import get_user_main_menu, get_user_catalogs, get_products_bts, get_user_cart_bts, get_simple_kb, \
-    get_search_result_bts
-import config
-from utils.utils import Paginator, save_bytes_to_image
+async def get_menu_main(level: int, menu_name: str):
 
+    urls_main_picture = 'https://kartinki.pics/uploads/posts/2022-12/1671752704_kartinkin-net-p-kartinki-elektroniki-instagram-5.jpg'
 
-async def get_menu_main(
-        level: int,
-        menu_name: str):
     answer_ = InputMediaPhoto(
-        media='https://kartinki.pics/uploads/posts/2022-12/1671752704_kartinkin-net-p-kartinki-elektroniki-instagram-5.jpg',
+        media=urls_main_picture,
         caption=config.answer[menu_name],
         parse_mode=ParseMode.HTML)
     kbds = get_user_main_menu(level=level)
     return answer_, kbds
 
 
-async def make_slugs_shorter(
-        catalogs: list):
+async def make_slugs_shorter(catalogs: list):
+
     for index, (k, v) in enumerate(catalogs):
         if v.count('-') >= 3:
             v = v.split('-')
@@ -60,20 +57,23 @@ async def get_menu_catalogs(
     return answer_, kbds
 
 
-def pages(
-        paginator: Paginator):
+def pages(paginator: Paginator):
+
     btns = dict()
     if paginator.has_previous():
         btns['prev'] = 'prev'
+    
     if paginator.has_next():
         btns['next'] = 'next'
+    
     return btns
 
 
-def get_description(
-        description: str):
+def get_description(description: str):
+
     if description:
         return description[:600] if len(description) > 500 else description
+    
     return 'Описание отсутствует.'
 
 
@@ -89,14 +89,14 @@ async def get_products(
     pagination_btns = pages(paginator)
     description = get_description(product.description)
     text = f'''
-<b>Заголовок:</b> {product.title}
-<b>Артикль:</b> {product.article}
-<b>В наличие:</b> {'Есть' if product.exist else 'Нет'}
-<b>Цена:</b> {product.price_list}
-<b>Описание:</b> {description}
-<b>Ссылка:</b> {product.url}
-Товар {paginator.page} из {paginator.pages}
-'''
+        <b>Заголовок:</b> {product.title}
+        <b>Артикль:</b> {product.article}
+        <b>В наличие:</b> {'Есть' if product.exist else 'Нет'}
+        <b>Цена:</b> {product.price_list}
+        <b>Описание:</b> {description}
+        <b>Ссылка:</b> {product.url}
+        Товар {paginator.page} из {paginator.pages}
+        '''
     answer_ = InputMediaPhoto(
         media=product.image,
         caption=text,
@@ -152,10 +152,10 @@ async def get_cart(
                 media=cart.product.image,
                 caption=f'''
                 <b>{cart.product.title}</b>
-    <b>Цена</b>: {cart.product.price_list}
-    <b>Кол в корзине</b>: {cart.quantity} шт, сумма: {cart_price} тг
-    Товар {paginator.page} из {paginator.pages} в корзине.
-    <b>Общая стоимость</b>: {total_price}''',
+                <b>Цена</b>: {cart.product.price_list}
+                <b>Кол в корзине</b>: {cart.quantity} шт, сумма: {cart_price} тг
+                Товар {paginator.page} из {paginator.pages} в корзине.
+                <b>Общая стоимость</b>: {total_price}''',
                 parse_mode=ParseMode.HTML
             )
             pagination_btns = pages(paginator)
@@ -166,7 +166,7 @@ async def get_cart(
                 product_id=cart.product_id)
         return answer_, kbds
     except Exception as e:
-        print(e)
+        print(f'Error in [get_cart]: {e}')
 
 
 async def search(
@@ -175,21 +175,24 @@ async def search(
         menu_name: str,
         page: int | None,
         message: str):
+    
     products = await get_product_db_by_title(message, session)
     paginator = Paginator(array=products, page=page)
     product = paginator.get_page()[0]
     pagination_btns = pages(paginator)
     description = get_description(product.description)
+
     answer_ = InputMediaPhoto(
         media=product.image,
         caption=f'''
-    <b>Заголовок:</b> {product.title}
-    <b>Артикль:</b> {product.article}
-    <b>В наличие:</b> {'Есть' if product.exist else 'Нет'}
-    <b>Цена:</b> {product.price_list if product.price_list else ''}
-    <b>Описание:</b> {description}
-    <b>Ссылка:</b> {product.url}
-    Товар {paginator.page} из {paginator.pages} найденного.''')
+        <b>Заголовок:</b> {product.title}
+        <b>Артикль:</b> {product.article}
+        <b>В наличие:</b> {'Есть' if product.exist else 'Нет'}
+        <b>Цена:</b> {product.price_list if product.price_list else ''}
+        <b>Описание:</b> {description}
+        <b>Ссылка:</b> {product.url}
+        Товар {paginator.page} из {paginator.pages} найденного.''')
+    
     kbds = get_search_result_bts(
         level=level,
         menu_name=menu_name,
@@ -197,8 +200,8 @@ async def search(
         product_id=product.id,
         pagination_btns=pagination_btns,
     )
-    return answer_, kbds
 
+    return answer_, kbds
 
 async def get_menu_content(
         level: int,

@@ -24,5 +24,4 @@ class Settings:
         self.DB_CONN_URL = f'postgresql+psycopg2://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'
 
 settings = Settings()
-
 os.makedirs("logs", exist_ok=True)

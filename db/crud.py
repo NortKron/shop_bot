@@ -18,15 +18,14 @@ async def get_db_catalogs(session: AsyncSession):
         logging.exception(e)
 
 
-async def get_db_products(session: AsyncSession,
-                          catalog_id: int):
+async def get_db_products(session: AsyncSession, catalog_id: int):
     try:
         query = select(Product).where(Product.category_id == catalog_id)
         result = await session.execute(query)
         return result.scalars().all()
     except Exception as e:
         logging.exception(e)
-        print(e)
+        print(f'get_db_products, error: {e}')
 
 
 async def add_db_user(
@@ -35,8 +34,18 @@ async def add_db_user(
         first_name: str | None = None,
         last_name: str | None = None,
         phone: str | None = None):
+    
+    
+    '''
+    TODO: Здесь происходит ошибка при добавлении повторяющегося ключа
+    '''
+
     try:
-        query = select(User).where(User.user_id == 6416664703)
+        
+        # fixed?
+        #query = select(User).where(User.user_id == 6416664703)
+        query = select(User).where(User.user_id == user_id)
+
         result = await session.execute(query)
         if result.first() is None:
             session.add(
@@ -47,13 +56,14 @@ async def add_db_user(
             )
             await session.commit()
     except Exception as e:
-        print(e)
+        print(f'add_db_user, error: {e}')
 
 
 async def add_to_db_cart(
         session: AsyncSession,
         user_id: int,
         product_id: int):
+    
     query = select(Cart).where(
         Cart.user_id == user_id,
         Cart.product_id == product_id)
@@ -75,6 +85,7 @@ async def delete_from_db_cart(
         session: AsyncSession,
         user_id: int,
         product_id: int):
+    
     query = delete(Cart).where(
         Cart.user_id == user_id,
         Cart.product_id == product_id)
@@ -86,6 +97,7 @@ async def reduce_product_in_db_cart(
         session: AsyncSession,
         user_id: int,
         product_id: int):
+    
     query = select(Cart).where(Cart.user_id == user_id, Cart.product_id == product_id).options(
         joinedload(Cart.product))
     cart = await session.execute(query)
@@ -110,7 +122,7 @@ async def get_user_carts(
         result = result.scalars().all()
         return result
     except Exception as e:
-        print(e)
+        print(f'get_user_carts, error: {e}')
 
 
 async def check_if_exist(session: AsyncSession,
@@ -118,18 +130,18 @@ async def check_if_exist(session: AsyncSession,
     query = select(Product).where(Product.id == product_id)
     result = await session.execute(query)
     result = result.scalar()
+
     if not result or result.exist is False:
         return False
+    
     return True
 
 
-async def get_product_db_by_title(
-        title: str,
-        session: AsyncSession):
+async def get_product_db_by_title(title: str, session: AsyncSession):
     try:
         query = select(Product).where(Product.title.ilike(f'%{title}%'))
         result = await session.execute(query)
         result = result.scalars().all()
         return result
     except Exception as e:
-        print(e)
+        print(f'get_product_db_by_title, error: {e}')

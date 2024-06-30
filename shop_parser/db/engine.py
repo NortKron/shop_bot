@@ -1,17 +1,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from config import settings
-from db.models import Base
+#from config import settings
+from shop_parser.config_old import settings
+
+#from db.models import Base
+from shop_parser.db.models_old import Base
 
 DATABASE_URL = settings.DB_CONN_URL
 print(DATABASE_URL)
 
 try:
-    engine = create_engine(DATABASE_URL, pool_size=6, echo=True)
+    engine = create_engine(DATABASE_URL, pool_size=6, echo=False)
     Session = sessionmaker(bind=engine)
 except Exception as e:
-    print(f'Module engine.py : {e}')
+    print(f'Error [engine.py]: {e}')
 
 
 def create_db():

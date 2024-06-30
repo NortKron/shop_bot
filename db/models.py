@@ -1,12 +1,18 @@
 import json
+from typing import Any
 from decimal import Decimal
 
-from sqlalchemy import (DateTime, ForeignKey, Numeric, String, Text, BigInteger, func, Boolean,
-                        JSON, ARRAY, LargeBinary)
+#from sqlalchemy import (DateTime, ForeignKey, Numeric, String, Text, func, Boolean, JSON)
+from sqlalchemy import (DateTime, ForeignKey, Numeric, String, Text, BigInteger, func, Boolean,JSON, ARRAY, LargeBinary)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-
 class Base(DeclarativeBase):
+
+    # Новое из др модуля
+    type_annotation_map = {
+        dict[str, Any]: JSON
+    }
+
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
 
@@ -31,7 +37,10 @@ class Product(Base):
     price_in_chain_stores: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
     price_in_the_online_store: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
     product_price_of_the_week: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
-    details: Mapped[json] = mapped_column(JSON, nullable=True)
+    
+    # TODO: Устранить ошибку с json
+    details: Mapped[json] = mapped_column(JSON, nullable=True)    
+    
     description: Mapped[str] = mapped_column(Text, nullable=True)
     url: Mapped[str] = mapped_column(String(150), nullable=True)
 

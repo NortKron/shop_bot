@@ -3,12 +3,13 @@ import json
 import os
 import time
 import random
-from urllib.parse import urljoin
-
 import requests
+
+from urllib.parse import urljoin
 from decimal import Decimal
 
-from db.models import Category
+#from db.models import Category
+from shop_parser.db.models_old import Category
 
 main_url = 'https://shop.kz/'
 

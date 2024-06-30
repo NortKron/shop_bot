@@ -5,6 +5,10 @@ from aiogram.types import TelegramObject
 
 from db.engine import AsyncSession
 
+'''
+Функции подключения и работы с базой данных
+Данный файл будет являться абстракцией базы данных от основного кода
+'''
 
 class DBSession(BaseMiddleware):
     def __init__(self, session_pool: AsyncSession) -> None:
@@ -19,3 +23,4 @@ class DBSession(BaseMiddleware):
         async with self.session_pool() as session:
             data['session'] = session
             return await handler(event, data)
+        

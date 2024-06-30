@@ -4,7 +4,6 @@ from typing import Any
 from sqlalchemy import (DateTime, ForeignKey, Numeric, String, Text, func, Boolean, JSON)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-
 class Base(DeclarativeBase):
     type_annotation_map = {
         dict[str, Any]: JSON
@@ -33,7 +32,10 @@ class Product(Base):
     price_in_chain_stores: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
     price_in_the_online_store: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
     product_price_of_the_week: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
+    
+    # TODO: Устранить ошибку с json
     details: Mapped[json] = mapped_column(JSON, nullable=True)
+    
     description: Mapped[str] = mapped_column(Text, nullable=True)
     url: Mapped[str] = mapped_column(String(150), nullable=True)
 

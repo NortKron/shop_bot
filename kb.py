@@ -2,11 +2,15 @@ from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup)
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import answer
-from utils.utils import MenuCallBack
+from utils.utils_bot import MenuCallBack
 
+'''
+Все клавиатуры, используемые ботом. 
+В этом файле будут находиться абсолютно все клавиатуры, 
+как статические, так и динамически генерируемые через функции
+'''
 
-def get_user_main_menu(level: int,
-                       size: tuple[int] = (2,)):
+def get_user_main_menu(level: int, size: tuple[int] = (2,)):
     kb = InlineKeyboardBuilder()
     btns = {
         'Поиск': 'search',

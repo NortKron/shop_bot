@@ -8,9 +8,10 @@ from datetime       import datetime
 from urllib.parse   import urljoin
 from bs4            import BeautifulSoup
 
-from db.crud        import bulk_insert_products, get_or_create_category
-from db.engine      import create_db
-from utils          import reload_request, convert_to_float, get_category_name, write_to_file
+from shop_parser.db.crud import bulk_insert_products, get_or_create_category
+from shop_parser.db.engine import create_db
+
+from utils.utils_parser import reload_request, convert_to_float, get_category_name, write_to_file
 
 def get_catalog(s, main_url):
     catalogs_urls = []
@@ -52,6 +53,7 @@ def get_product(s, category_obj, product_url, main_url):
         li_price = div_container.find(
             'div',
             class_='bx-more-prices').find_all('li') if div_container.find('div', class_='bx-more-prices') else None
+        
         if li_price:
             price_map = {
                 'Цена по прайсу': 'price_list',
@@ -97,6 +99,9 @@ def get_products(s, category_obj, catalog_products_urls, main_url):
 
 
 def get_catalog_products(s, catalog_url, main_url):
+
+    print('---> get_catalog_products - 1 <--- ')
+
     r = reload_request(s, 'GET', catalog_url)
     soup = BeautifulSoup(r.text, 'lxml')
     catalog_rus = soup.find('div', class_='bx-title__container').get_text(strip=True).lower()
@@ -107,6 +112,8 @@ def get_catalog_products(s, catalog_url, main_url):
         div_pages = div_pages.find('ul').find_all('li')
     total_pages = int(div_pages[-2].text) if div_pages else 1
     page = 2
+
+    print('---> get_catalog_products - 2 <--- ')
     while True:
         dev_products = [div.find('a')['href'] for div in soup.find_all('div', class_='bx_catalog_item_title')]
         catalog_products_urls = [urljoin(main_url, url) for url in dev_products]
@@ -118,6 +125,7 @@ def get_catalog_products(s, catalog_url, main_url):
         r = reload_request(s, 'GET', catalog_url, params=params)
         soup = BeautifulSoup(r.text, 'lxml')
         page += 1
+    print('---> get_catalog_products - 3 <--- ')
 
 def get_sub_catalog_urls(s, catalog_url, main_url):
     r = reload_request(s, 'GET', catalog_url)
@@ -136,36 +144,74 @@ def get_sub_catalog_urls_all(s, catalog_url, main_url):
     return sub_catalog_devs
 
 def main():
-    try:
-        print('start...')
+    #try:
+    print('start: create_db')
+    create_db()
 
-        create_db()
-        main_url = 'https://shop.kz/'
-        s = requests.Session()
-        s.headers.update({
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'Accept-Encoding': 'gzip, deflate, br, zstd',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Cache-Control': 'no-cache',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
-        })
-        catalogs_urls = get_catalog(s, main_url)
-        random.shuffle(catalogs_urls)
-        for catalog_url in catalogs_urls:
-            sub_catalogs_urls = get_sub_catalog_urls(s, catalog_url, main_url)
-            random.shuffle(sub_catalogs_urls)
-            for sub_catalog_url in sub_catalogs_urls:
-                sub_sub_catalogs_urls = get_sub_catalog_urls(s, sub_catalog_url, main_url)
-                logging.info('len sub_sub_catalogs_urls: f{len(sub_sub_catalogs_urls)}')
-                random.shuffle(sub_sub_catalogs_urls)
-                for sub_sub_catalog_url in sub_sub_catalogs_urls:
-                    get_catalog_products(s, sub_sub_catalog_url, main_url)
-                delay = random.uniform(1, 3)
-                time.sleep(delay)
-        logging.info(f'Parsing finish: {datetime.now().time()}')
+    main_url = 'https://shop.kz/'
+
+    print('session')
+    s = requests.Session()
+
+    print('update')
+    s.headers.update({
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Accept-Encoding': 'gzip, deflate, br, zstd',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cache-Control': 'no-cache',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+    })
+
+    print('get_catalog')
+    catalogs_urls = get_catalog(s, main_url)
+    
+    print('updashufflee')
+    random.shuffle(catalogs_urls)
+    
+    print('Pause 1')
+    time.sleep(2)
+
+    print(f'len catalogs_urls - {len(catalogs_urls)}')
+
+    for catalog_url in catalogs_urls:
+        sub_catalogs_urls = get_sub_catalog_urls(s, catalog_url, main_url)
+        print(f'len sub_catalogs_urls - {len(sub_catalogs_urls)}')
+
+
+        print('Pause 2 -1')
+        time.sleep(1)
+        random.shuffle(sub_catalogs_urls)
+        
+        for sub_catalog_url in sub_catalogs_urls:
+            sub_sub_catalogs_urls = get_sub_catalog_urls(s, sub_catalog_url, main_url)
+            print(f'len sub_sub_catalogs_urls - {len(sub_sub_catalogs_urls)}')
+
+            print('Pause 2 -2')
+            time.sleep(1)
+
+            logging.info('len sub_sub_catalogs_urls: f{len(sub_sub_catalogs_urls)}')
+            
+            # TODO: Перетасовка списка с помощью функции shuffle - нужна ли?
+            random.shuffle(sub_sub_catalogs_urls)
+            
+            for sub_sub_catalog_url in sub_sub_catalogs_urls:
+                get_catalog_products(s, sub_sub_catalog_url, main_url)
+
+                print('Pause 2 -3')
+                time.sleep(1)
+
+            delay = random.uniform(1, 3)
+            time.sleep(delay)
+
+    print('Pause 3')
+    time.sleep(10)
+
+    logging.info(f'Parsing finish: {datetime.now().time()}')
+    '''
     except Exception as e:
         print(f'Main Exception : {e}')
         logging.error(f'Main Exception : {e}')
+    '''
 
 def get_sub_catalogs_urls():
     sub_catalog_urls = {}
@@ -190,6 +236,7 @@ def get_sub_catalogs_urls():
             for div in sub_sub_catalog_devs:
                 sub_catalog_urls[div.text.replace('\n', '')] = urljoin(main_url, div.find('a')['href'])
     write_to_file('sub_catalogs_url.json', sub_catalog_urls)
+
 
 if __name__ == '__main__':
     logging.basicConfig(

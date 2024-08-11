@@ -45,8 +45,7 @@ async def get_menu_catalogs(
     pagination_btns = pages(paginator)
     answer_ = InputMediaPhoto(
         media='https://kartinki.pics/uploads/posts/2022-12/1671752661_kartinkin-net-p-kartinki-elektroniki-instagram-7.jpg',
-        caption=f'''<b>Cписок каталогов:</b>
-        Страница {paginator.page} из {paginator.pages}''',
+        caption=f'''<b>Cписок каталогов:</b>Страница {paginator.page} из {paginator.pages}''',
         parse_mode=ParseMode.HTML
     )
     kbds = get_user_catalogs(

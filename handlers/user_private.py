@@ -61,7 +61,7 @@ async def user_menu(callback: types.CallbackQuery,
             await callback.answer('Отправьте название товара:')
             return
 
-        # Fix с нераотающим перелистыванием найденных товаров
+        # Fix с неработающим перелистыванием найденных товаров
         data_state = await state.get_data()
         message = data_state['text_search']
 

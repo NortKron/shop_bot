@@ -129,7 +129,6 @@ def get_products_bts(level: int,
                     page=page - 1).pack()))
     return kb.row(*row).as_markup()
 
-
 def get_user_cart_bts(
         level: int,
         page: int | None,

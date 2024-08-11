@@ -8,7 +8,6 @@ from sqlalchemy.orm import joinedload
 from db.models import Product, User, Cart, Category
 from db.engine import AsyncSession
 
-
 async def get_db_catalogs(session: AsyncSession):
     try:
         sql_query = select(Category)

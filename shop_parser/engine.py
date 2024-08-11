@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from shop_parser.config_old import settings
 
 #from db.models import Base
-from shop_parser.db.models_old import Base
+from shop_parser.models_old import Base
 
 DATABASE_URL = settings.DB_CONN_URL
 print(DATABASE_URL)

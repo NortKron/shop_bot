@@ -5,7 +5,7 @@ import logging
 
 #from datetime import datetime
 
-from shop_parser.db.engine import Session
+from shop_parser.engine import Session
 
 from db.models import Product, Category
 #from shop_parser.db.models_old import Product, Category
@@ -34,7 +34,6 @@ def bulk_insert_products(products_data: list):
 
     '''
     TODO: Здесь происодит ошибка при повторяющемся ключе
-    
     '''
     
     try:

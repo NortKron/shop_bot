@@ -45,14 +45,14 @@ async def main():
     await dp.start_polling(bot, allowed_updates=ALLOWED_UPDATES)
 
     print('finished!')
-
     
 
 if __name__ == "__main__":
     
     # Запуск парсера
+    # Парсер заполняет БД товарами, с которыми работает телеграм-бот
     # TODO: запускать парсер в отдельном потоке Thread
     #parser_main.main()
-
+    
     # Запуск бота
     asyncio.run(main())
